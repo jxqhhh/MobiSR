@@ -25,6 +25,7 @@ public class ModelCatalogueFragmentController extends
         add("alexnet");
         add("inception_v3");
         add("googlenet");
+        add("rcan_bix2");
     }};
 
     private final Context mContext;

@@ -71,7 +71,7 @@ public class LoadNetworkTask extends AsyncTask<File, Void, NeuralNetwork> {
             final long end = SystemClock.elapsedRealtime();
 
             mLoadTime = end - start;
-        } catch (IllegalStateException | IOException e) {
+        } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage(), e);
         }
         return network;

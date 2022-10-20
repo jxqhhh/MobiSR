@@ -111,7 +111,7 @@ public class LoadModelsTask extends AsyncTask<Void, Void, Set<Model>> {
                 }
             });
         }
-        model.labels = loadLabels(new File(modelDir, LABELS_FILE_NAME));
+        //model.labels = loadLabels(new File(modelDir, LABELS_FILE_NAME));
         return model;
     }
 

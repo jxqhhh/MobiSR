@@ -14,6 +14,8 @@ import com.qualcomm.qti.snpe.SNPE;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.AbstractClassifyImageTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.ClassifyImageWithFloatTensorTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.ClassifyImageWithUserBufferTf8Task;
+import com.qualcomm.qti.snpe.imageclassifiers.tasks.AbstractSuperResolutionTask;
+import com.qualcomm.qti.snpe.imageclassifiers.tasks.SuperResolutionWithFloatTensorTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.LoadImageTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.LoadNetworkTask;
 
@@ -32,7 +34,7 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
 
     public enum SupportedTensorFormat {
         FLOAT,
-        UB_TF8
+        // UB_TF8
     }
 
     private final Map<String, SoftReference<Bitmap>> mBitmapCache;
@@ -123,6 +125,12 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
         }
     }
 
+    public void onSuperResolutionResult(Bitmap bitmap) {
+        if (isAttached()) {
+            getView().addSampleBitmap(bitmap);
+        }
+    }
+
     public void onNetworkLoaded(NeuralNetwork neuralNetwork, final long loadTime) {
         if (isAttached()) {
             mNeuralNetwork = neuralNetwork;
@@ -148,13 +156,29 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
         mNetworkTensorFormat = null;
     }
 
+    public void superResolution(final Bitmap bitmap) {
+        if (mNeuralNetwork != null) {
+            AbstractSuperResolutionTask task;
+            switch (mNetworkTensorFormat) {
+                case FLOAT:
+                default:
+                    task = new SuperResolutionWithFloatTensorTask(this, mNeuralNetwork, bitmap, mModel);
+                    break;
+            }
+            task.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
+
+        } else {
+            getView().displayModelNotLoaded();
+        }
+    }
+
     public void classify(final Bitmap bitmap) {
         if (mNeuralNetwork != null) {
             AbstractClassifyImageTask task;
             switch (mNetworkTensorFormat) {
-                case UB_TF8:
+                /*case UB_TF8:
                     task = new ClassifyImageWithUserBufferTf8Task(this, mNeuralNetwork, bitmap, mModel);
-                    break;
+                    break;*/
                 case FLOAT:
                 default:
                     task = new ClassifyImageWithFloatTensorTask(this, mNeuralNetwork, bitmap, mModel);
@@ -174,6 +198,8 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
             view.setJavaExecuteStatistics(javaExecuteTime);
         }
     }
+
+
 
     public void onClassificationFailed() {
         if (isAttached()) {
