@@ -18,6 +18,7 @@ import com.qualcomm.qti.snpe.imageclassifiers.tasks.AbstractSuperResolutionTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.SuperResolutionWithFloatTensorTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.LoadImageTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.LoadNetworkTask;
+import com.qualcomm.qti.snpe.imageclassifiers.tasks.SuperResolutionWithUserBufferTf8Task;
 
 import java.io.File;
 import java.lang.ref.SoftReference;
@@ -34,7 +35,7 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
 
     public enum SupportedTensorFormat {
         FLOAT,
-        // UB_TF8
+        UB_TF8
     }
 
     private final Map<String, SoftReference<Bitmap>> mBitmapCache;
@@ -125,9 +126,11 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
         }
     }
 
-    public void onSuperResolutionResult(Bitmap bitmap) {
+    public void onSuperResolutionResult(Bitmap bitmap, long javaExecuteTime) {
         if (isAttached()) {
-            getView().addSampleBitmap(bitmap);
+            ModelOverviewFragment view = getView();
+            view.addSampleBitmap(bitmap);
+            view.setJavaExecuteStatistics(javaExecuteTime);
         }
     }
 
@@ -160,6 +163,9 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
         if (mNeuralNetwork != null) {
             AbstractSuperResolutionTask task;
             switch (mNetworkTensorFormat) {
+                case UB_TF8:
+                    task = new SuperResolutionWithUserBufferTf8Task(this, mNeuralNetwork, bitmap, mModel);
+                    break;
                 case FLOAT:
                 default:
                     task = new SuperResolutionWithFloatTensorTask(this, mNeuralNetwork, bitmap, mModel);
@@ -176,9 +182,9 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
         if (mNeuralNetwork != null) {
             AbstractClassifyImageTask task;
             switch (mNetworkTensorFormat) {
-                /*case UB_TF8:
+                case UB_TF8:
                     task = new ClassifyImageWithUserBufferTf8Task(this, mNeuralNetwork, bitmap, mModel);
-                    break;*/
+                    break;
                 case FLOAT:
                 default:
                     task = new ClassifyImageWithFloatTensorTask(this, mNeuralNetwork, bitmap, mModel);

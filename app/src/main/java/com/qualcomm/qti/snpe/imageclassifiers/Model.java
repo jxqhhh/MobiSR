@@ -18,6 +18,7 @@ public class Model implements Parcelable {
     public static final String INVALID_ID = "null";
 
     public File file;
+    public File quantizedFile;
     public File udoDir;
     public File udoArmDir;
     public File[] udoConfigs;

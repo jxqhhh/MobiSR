@@ -59,7 +59,7 @@ public abstract class AbstractSuperResolutionTask extends AsyncTask<Bitmap, Void
     @Override
     protected void onPostExecute(Bitmap hr) {
         super.onPostExecute(hr);
-        mController.onSuperResolutionResult(hr);
+        mController.onSuperResolutionResult(hr, mJavaExecuteTime);
     }
 
     void loadMeanImageIfAvailable(File meanImage, final int imageSize) {
@@ -146,10 +146,8 @@ public abstract class AbstractSuperResolutionTask extends AsyncTask<Bitmap, Void
             return new float[] {preProcess(b), preProcess(g), preProcess(r)};
         } else if (modelName.equals("googlenet") && mMeanImage != null) {
             return new float[] {preProcess(b), preProcess(g), preProcess(r)};
-        } else if (modelName.equals("rcan_bix2")) {
-            return new float[] {preProcess(r), preProcess(g), preProcess(b)}; // 存疑，RCAN是用scipy.misc.imread读取的图片（mode参数为None），imread则是直接调用的PIl的open
         } else {
-            return new float[] {preProcess(r), preProcess(g), preProcess(b)};
+            return new float[] {preProcess(r), preProcess(g), preProcess(b)}; // 存疑，RCAN是用scipy.misc.imread读取的图片（mode参数为None），imread则是直接调用的PIl的open
         }
     }
 

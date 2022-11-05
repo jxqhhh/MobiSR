@@ -88,7 +88,7 @@ public class ModelOverviewFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final Bitmap bitmap = mImageGridAdapter.getItem(position);
-                mController.classify(bitmap);
+                mController.superResolution(bitmap);
             }
         });
 

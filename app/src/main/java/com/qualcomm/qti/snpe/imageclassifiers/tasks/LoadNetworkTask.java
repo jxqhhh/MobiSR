@@ -55,13 +55,17 @@ public class LoadNetworkTask extends AsyncTask<File, Void, NeuralNetwork> {
     protected NeuralNetwork doInBackground(File... params) {
         NeuralNetwork network = null;
         try {
-            final SNPE.NeuralNetworkBuilder builder = new SNPE.NeuralNetworkBuilder(mApplication)
+            final SNPE.NeuralNetworkBuilder builder= new SNPE.NeuralNetworkBuilder(mApplication)
                     .setDebugEnabled(false)
                     .setRuntimeOrder(mTargetRuntime)
-                    .setModel(mModel.file)
                     .setCpuFallbackEnabled(true)
                     .setUseUserSuppliedBuffers(mTensorFormat != SupportedTensorFormat.FLOAT)
                     .setUnsignedPD(mUnsignedPD);
+            if (mTensorFormat.equals(SupportedTensorFormat.UB_TF8)){
+                builder.setModel(mModel.quantizedFile);
+            } else {
+                builder.setModel(mModel.file);
+            }
             if (mUnsignedPD){
                 builder.setRuntimeCheckOption(NeuralNetwork.RuntimeCheckOption.UNSIGNEDPD_CHECK);
             }

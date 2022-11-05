@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class SuperResolutionWithFloatTensorTask extends AbstractSuperResolutionTask {
 
-    private static final String LOG_TAG = ClassifyImageWithFloatTensorTask.class.getSimpleName();
+    private static final String LOG_TAG = SuperResolutionWithFloatTensorTask.class.getSimpleName();
 
     public SuperResolutionWithFloatTensorTask(ModelOverviewFragmentController controller,
                                             NeuralNetwork network, Bitmap image, Model model) {
@@ -28,7 +28,7 @@ public class SuperResolutionWithFloatTensorTask extends AbstractSuperResolutionT
     protected Bitmap doInBackground(Bitmap... params) {
 
         Bitmap result = null;
-
+        System.out.println(mNeuralNetwork.getInputTensorsShapes().get(mInputLayer));
         final FloatTensor tensor = mNeuralNetwork.createFloatTensor(
                 mNeuralNetwork.getInputTensorsShapes().get(mInputLayer));
 
@@ -63,11 +63,11 @@ public class SuperResolutionWithFloatTensorTask extends AbstractSuperResolutionT
                 int pixels_idx = 0;
                 for (int i = 0; i < mImage.getHeight()*2; i ++) {
                     for (int j = 0; j < mImage.getWidth() * 2; j ++) {
-                        int pixel = 1 << 24;
+                        int pixel = 0xf0 << 24;
                         for (int c = 0; c < 3; c ++){
                             int idx = 3 * (i * mImage.getWidth() * 2 + j) + c;
                             int offset = 8 * c;
-                            pixel += ((int)array[idx]) << offset;
+                            pixel += (((int)array[idx]) & 0xff) << offset;
                         }
                         pixels[pixels_idx] = pixel;
                         pixels_idx ++;
