@@ -24,10 +24,9 @@
     <string name="builder_tensor_format">Tensor</string>
     <string name="statistic_init">Net Init</string>
     <string name="statistic_java_execute">Java Execute</string>
-    <string name="statistic_native_execute">Native Execute</string>
     <string name="model_statistic_init_placeholder">12345 ms</string>
     <string name="model_statistic_execute_placeholder">20 ms</string>
     <string name="not_available">N/A</string>
     <string name="build_network">Build network!</string>
-    <string name="classification_hint">Click on an image to classify</string>
+    <string name="classification_hint">Click on an image for super-resolution</string>
 </resources>
