@@ -26,6 +26,18 @@
             android:name=".ModelExtractionService"
             android:exported="false">
         </service>
+        <service
+            android:name=".tasks.CPUSuperResolutionService"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".tasks.GPUSuperResolutionService"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".tasks.DSPSuperResolutionService"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>
