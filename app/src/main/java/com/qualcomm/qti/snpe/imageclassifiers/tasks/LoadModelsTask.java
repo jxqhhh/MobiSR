@@ -28,6 +28,7 @@ import java.util.Set;
 public class LoadModelsTask extends AsyncTask<Void, Void, Set<Model>> {
 
     public static final String MODEL_DLC_FILE_NAME = "model.dlc";
+    public static final String WEAK_MODEL_DLC_FILE_NAME = "model2.dlc";
     public static final String QUANTIZED_MODEL_DLC_FILE_NAME = "quantized_model.dlc";
     public static final String MODEL_MEAN_IMAGE_FILE_NAME = "mean_image.bin";
     public static final String LABELS_FILE_NAME = "labels.txt";
@@ -82,6 +83,7 @@ public class LoadModelsTask extends AsyncTask<Void, Void, Set<Model>> {
         final Model model = new Model();
         model.name = modelDir.getName();
         model.file = new File(modelDir, MODEL_DLC_FILE_NAME);
+        model.file2 = new File(modelDir, WEAK_MODEL_DLC_FILE_NAME);
         model.quantizedFile = new File(modelDir, QUANTIZED_MODEL_DLC_FILE_NAME);
         model.meanImage = new File(modelDir, MODEL_MEAN_IMAGE_FILE_NAME);
         final File images = new File(modelDir, IMAGES_FOLDER_NAME);

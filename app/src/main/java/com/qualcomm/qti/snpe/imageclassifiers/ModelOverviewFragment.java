@@ -116,7 +116,7 @@ public class ModelOverviewFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
         final Model model = getArguments().getParcelable(EXTRA_MODEL);
-        mController = new ModelOverviewFragmentController(
+        mController = new ModelOverviewFragmentController(getActivity(),
                 (Application) getActivity().getApplicationContext(), model, mUnsignedPD);
     }
 

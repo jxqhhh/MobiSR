@@ -17,7 +17,6 @@ import com.qualcomm.qti.snpe.imageclassifiers.ModelOverviewFragmentController;
 import com.qualcomm.qti.snpe.imageclassifiers.ModelOverviewFragmentController.SupportedTensorFormat;
 
 import java.io.File;
-import java.io.IOException;
 
 public class LoadNetworkTask extends AsyncTask<File, Void, NeuralNetwork> {
 
@@ -61,8 +60,8 @@ public class LoadNetworkTask extends AsyncTask<File, Void, NeuralNetwork> {
                     .setCpuFallbackEnabled(true)
                     .setUseUserSuppliedBuffers(mTensorFormat != SupportedTensorFormat.FLOAT)
                     .setUnsignedPD(mUnsignedPD);
-            if (mTensorFormat.equals(SupportedTensorFormat.UB_TF8)){
-                builder.setModel(mModel.quantizedFile);
+            if (mTargetRuntime.equals(NeuralNetwork.Runtime.DSP)){
+                builder.setModel(mModel.file2);
             } else {
                 builder.setModel(mModel.file);
             }
@@ -74,6 +73,15 @@ public class LoadNetworkTask extends AsyncTask<File, Void, NeuralNetwork> {
             network = builder.build();
             final long end = SystemClock.elapsedRealtime();
 
+            if(mTargetRuntime.equals(NeuralNetwork.Runtime.CPU)){
+                CPUSuperResolutionService.mNeuralNetwork = network;
+            }else if(mTargetRuntime.equals(NeuralNetwork.Runtime.GPU)){
+                GPUSuperResolutionService.mNeuralNetwork = network;
+            }else if(mTargetRuntime.equals(NeuralNetwork.Runtime.DSP)){
+                DSPSuperResolutionService.mNeuralNetwork = network;
+            }else {
+                throw new Exception("Not supported runtime");
+            }
             mLoadTime = end - start;
         } catch (Exception e) {
             Log.e(LOG_TAG, e.getMessage(), e);

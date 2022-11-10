@@ -165,6 +165,13 @@ public class ModelExtractionService extends IntentService {
             throw new IOException("Unable to create model root directory: " +
                 modelRoot.getAbsolutePath());
         }
+        final File imagesRoot = new File(modelRoot, "images");
+        if (!imagesRoot.isDirectory()) {
+            if( !imagesRoot.mkdir()) {
+                throw new IOException("Unable to create image root directory: " +
+                        imagesRoot.getAbsolutePath());
+            }
+        }
         return modelRoot;
     }
 

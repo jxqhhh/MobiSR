@@ -22,18 +22,7 @@ public class ModelCatalogueFragmentController extends
     AbstractViewController<ModelCatalogueFragment> {
 
     private static final Set<String> mSupportedModels = new HashSet<String>() {{
-        add("alexnet");
-        add("inception_v3");
-        add("googlenet");
-        add("clc");
-        add("eff");
-        add("m1");
-        //add("m2");
-        add("s1");
-        add("s2");
-        add("rxn");
-        add("rn2");
-        add("rn4");
+        add("mobisr");
     }};
 
     private final Context mContext;

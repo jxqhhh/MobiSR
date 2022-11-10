@@ -18,6 +18,7 @@ public class Model implements Parcelable {
     public static final String INVALID_ID = "null";
 
     public File file;
+    public File file2;
     public File quantizedFile;
     public File udoDir;
     public File udoArmDir;
@@ -30,6 +31,7 @@ public class Model implements Parcelable {
 
     protected Model(Parcel in) {
         name = in.readString();
+        file = new File(in.readString());
         file = new File(in.readString());
 
         final String[] rawPaths = new String[in.readInt()];
@@ -52,6 +54,7 @@ public class Model implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
         dest.writeString(file.getAbsolutePath());
+        dest.writeString(file2.getAbsolutePath());
         dest.writeInt(rawImages.length);
         dest.writeStringArray(toPaths(rawImages));
         dest.writeInt(jpgImages.length);
