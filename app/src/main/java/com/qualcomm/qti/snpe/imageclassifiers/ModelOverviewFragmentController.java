@@ -9,6 +9,9 @@ import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.os.SystemClock;
 
 import com.qualcomm.qti.snpe.NeuralNetwork;
@@ -40,9 +43,9 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
     final float GPUDelay = 35;
     final float DSPDelay = 15;
 
-    final int patch_width = 90;
-    final int patch_height = 160;
-    final int overlapping_size = 10;
+    final public static int patch_width = 90;
+    final public static int patch_height = 160;
+    final public static int overlapping_size = 10;
     final float TV_threshold = 12;
 
     private final Map<String, SoftReference<Bitmap>> mBitmapCache;
@@ -68,6 +71,9 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
     private SupportedTensorFormat mNetworkTensorFormat;
 
     private boolean mUnsignedPD;
+
+    public static int SuperResolutionServiceResultCode = 1;
+    public static String SuperResolutionServiceResultKey = "patch";
 
     public ModelOverviewFragmentController(final Context context, final Application application, Model model, boolean unsignedPD) {
         mContext = context;
@@ -188,6 +194,17 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
             // TODO: 在这记录开始时间
             // TODO: divide into patches
             // TODO: call AsyncTask。每个AsyncTask是一个线程顺序执行，多个AysncTask类对应多个线程。
+        Handler handler = new Handler();
+        ResultReceiver resultReceiver = new ResultReceiver(handler){
+            @Override
+            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                if(resultCode==SuperResolutionServiceResultCode){
+                    final Bitmap patch = resultData.getParcelable(SuperResolutionServiceResultKey);
+                }else{
+                    System.out.println("Error: unexpected result code");
+                }
+            }
+        };
         final long start = SystemClock.elapsedRealtime();
         System.out.println("Start super-resolution at "+start);
         float timeCPU = 0;
@@ -198,7 +215,7 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
                 float TV = getTV(patch);
                 if (TV<TV_threshold){
                     if(timeCPU+CPUDelay<timeGPU+GPUDelay){
-                        CPUSuperResolutionService.processPatch(mContext, bitmap);
+                        CPUSuperResolutionService.processPatch(mContext, bitmap, resultReceiver);
                         timeCPU += CPUDelay;
                     }else{
                         GPUSuperResolutionService.processPatch(mContext, bitmap);
@@ -209,8 +226,6 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
                 }
             }
         }
-
-            CPUSuperResolutionService.processPatch(mContext, bitmap);
             // TODO: 利用ResultReceiver获得数据
 
             // TODO： 在callback里记录完成时间（每次callback给n+1，当n等于numberPatches说明搞定了）
