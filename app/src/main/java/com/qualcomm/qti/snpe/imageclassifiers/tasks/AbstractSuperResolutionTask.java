@@ -18,7 +18,7 @@ import java.util.Set;
 
 public abstract class AbstractSuperResolutionTask extends AsyncTask<Bitmap, Void, Bitmap> {
 
-    private static final String LOG_TAG = AbstractClassifyImageTask.class.getSimpleName();
+    private static final String LOG_TAG = AbstractSuperResolutionTask.class.getSimpleName();
 
     private static final int FLOAT_SIZE = 4;
 

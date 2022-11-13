@@ -18,11 +18,9 @@ public class Model implements Parcelable {
     public static final String INVALID_ID = "null";
 
     public File file;
-    public File quantizedFile;
     public File udoDir;
     public File udoArmDir;
     public File[] udoConfigs;
-    public String[] labels;
     public File[] rawImages;
     public File[] jpgImages;
     public String name;
@@ -42,8 +40,6 @@ public class Model implements Parcelable {
 
         meanImage = new File(in.readString());
 
-        labels = new String[in.readInt()];
-        in.readStringArray(labels);
     }
 
     public Model() {}
@@ -57,8 +53,6 @@ public class Model implements Parcelable {
         dest.writeInt(jpgImages.length);
         dest.writeStringArray(toPaths(jpgImages));
         dest.writeString(meanImage.getAbsolutePath());
-        dest.writeInt(labels.length);
-        dest.writeStringArray(labels);
     }
 
     private File[] fromPaths(String[] paths) {

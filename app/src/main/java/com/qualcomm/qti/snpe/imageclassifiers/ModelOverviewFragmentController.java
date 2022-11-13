@@ -11,9 +11,6 @@ import android.os.AsyncTask;
 
 import com.qualcomm.qti.snpe.NeuralNetwork;
 import com.qualcomm.qti.snpe.SNPE;
-import com.qualcomm.qti.snpe.imageclassifiers.tasks.AbstractClassifyImageTask;
-import com.qualcomm.qti.snpe.imageclassifiers.tasks.ClassifyImageWithFloatTensorTask;
-import com.qualcomm.qti.snpe.imageclassifiers.tasks.ClassifyImageWithUserBufferTf8Task;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.AbstractSuperResolutionTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.SuperResolutionWithFloatTensorTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.LoadImageTask;
@@ -34,8 +31,7 @@ import java.util.Set;
 public class ModelOverviewFragmentController extends AbstractViewController<ModelOverviewFragment> {
 
     public enum SupportedTensorFormat {
-        FLOAT,
-        UB_TF8
+        FLOAT
     }
 
     private final Map<String, SoftReference<Bitmap>> mBitmapCache;
@@ -163,9 +159,6 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
         if (mNeuralNetwork != null) {
             AbstractSuperResolutionTask task;
             switch (mNetworkTensorFormat) {
-                case UB_TF8:
-                    task = new SuperResolutionWithUserBufferTf8Task(this, mNeuralNetwork, bitmap, mModel);
-                    break;
                 case FLOAT:
                 default:
                     task = new SuperResolutionWithFloatTensorTask(this, mNeuralNetwork, bitmap, mModel);
@@ -178,41 +171,6 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
         }
     }
 
-    public void classify(final Bitmap bitmap) {
-        if (mNeuralNetwork != null) {
-            AbstractClassifyImageTask task;
-            switch (mNetworkTensorFormat) {
-                case UB_TF8:
-                    task = new ClassifyImageWithUserBufferTf8Task(this, mNeuralNetwork, bitmap, mModel);
-                    break;
-                case FLOAT:
-                default:
-                    task = new ClassifyImageWithFloatTensorTask(this, mNeuralNetwork, bitmap, mModel);
-                    break;
-            }
-            task.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
-
-        } else {
-            getView().displayModelNotLoaded();
-        }
-    }
-
-    public void onClassificationResult(String[] labels, long javaExecuteTime) {
-        if (isAttached()) {
-            ModelOverviewFragment view = getView();
-            view.setClassificationResult(labels);
-            view.setJavaExecuteStatistics(javaExecuteTime);
-        }
-    }
-
-
-
-    public void onClassificationFailed() {
-        if (isAttached()) {
-            getView().displayClassificationFailed();
-            getView().setJavaExecuteStatistics(-1);
-        }
-    }
 
     public void setTargetRuntime(NeuralNetwork.Runtime runtime) {
         mRuntime = runtime;

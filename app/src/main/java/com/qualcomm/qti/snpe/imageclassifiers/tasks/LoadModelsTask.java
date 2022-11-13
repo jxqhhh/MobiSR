@@ -82,7 +82,6 @@ public class LoadModelsTask extends AsyncTask<Void, Void, Set<Model>> {
         final Model model = new Model();
         model.name = modelDir.getName();
         model.file = new File(modelDir, MODEL_DLC_FILE_NAME);
-        model.quantizedFile = new File(modelDir, QUANTIZED_MODEL_DLC_FILE_NAME);
         model.meanImage = new File(modelDir, MODEL_MEAN_IMAGE_FILE_NAME);
         final File images = new File(modelDir, IMAGES_FOLDER_NAME);
 

@@ -60,12 +60,8 @@ public class LoadNetworkTask extends AsyncTask<File, Void, NeuralNetwork> {
                     .setRuntimeOrder(mTargetRuntime)
                     .setCpuFallbackEnabled(true)
                     .setUseUserSuppliedBuffers(mTensorFormat != SupportedTensorFormat.FLOAT)
-                    .setUnsignedPD(mUnsignedPD);
-            if (mTensorFormat.equals(SupportedTensorFormat.UB_TF8)){
-                builder.setModel(mModel.quantizedFile);
-            } else {
-                builder.setModel(mModel.file);
-            }
+                    .setUnsignedPD(mUnsignedPD)
+                    .setModel(mModel.file);
             if (mUnsignedPD){
                 builder.setRuntimeCheckOption(NeuralNetwork.RuntimeCheckOption.UNSIGNEDPD_CHECK);
             }
