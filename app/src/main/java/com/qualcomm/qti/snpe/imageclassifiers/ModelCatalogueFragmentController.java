@@ -36,13 +36,16 @@ public class ModelCatalogueFragmentController extends
         view.setExtractingModelMessageVisible(true);
 
         final ContentResolver contentResolver = mContext.getContentResolver();
+        // ModelExtractionService在解压失败后调用mModelExtractionFailedObserver
         contentResolver.registerContentObserver(Uri.withAppendedPath(
             Model.MODELS_URI, Model.INVALID_ID), false, mModelExtractionFailedObserver);
-
+        // ModelExtractionService在解压成功后调用mModelExtractionObserver
         contentResolver.registerContentObserver(Model.MODELS_URI, true, mModelExtractionObserver);
 
-        startModelsExtraction();
-        loadModels();
+        startModelsExtraction(); // 利用ModelExtractionService解压尚未加压的zip。如果解压成功会调用mModelExtractionObserver，然后再次调用loadModels
+        loadModels(); // 对之前已经解压好的模型文件夹进行解析，生成Model类对象集合
+
+        // 最终解压完成后LoadModelsTask会回调onModelsLoaded
     }
 
     private void startModelsExtraction() {

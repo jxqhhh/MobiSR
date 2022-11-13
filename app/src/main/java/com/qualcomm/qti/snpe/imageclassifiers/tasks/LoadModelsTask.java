@@ -115,19 +115,7 @@ public class LoadModelsTask extends AsyncTask<Void, Void, Set<Model>> {
                 }
             });
         }
-        //model.labels = loadLabels(new File(modelDir, LABELS_FILE_NAME));
         return model;
-    }
-
-    private String[] loadLabels(File labelsFile) throws IOException {
-        final List<String> list = new LinkedList<>();
-        final BufferedReader inputStream = new BufferedReader(
-            new InputStreamReader(new FileInputStream(labelsFile)));
-        String line;
-        while ((line = inputStream.readLine()) != null) {
-            list.add(line);
-        }
-        return list.toArray(new String[list.size()]);
     }
 
     private void udoRegister(Model mModel){

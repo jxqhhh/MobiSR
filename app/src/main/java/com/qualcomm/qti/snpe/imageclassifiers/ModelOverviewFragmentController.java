@@ -13,18 +13,11 @@ import android.os.SystemClock;
 
 import com.qualcomm.qti.snpe.NeuralNetwork;
 import com.qualcomm.qti.snpe.SNPE;
-import com.qualcomm.qti.snpe.imageclassifiers.tasks.AbstractClassifyImageTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.CPUSuperResolutionService;
-import com.qualcomm.qti.snpe.imageclassifiers.tasks.ClassifyImageWithFloatTensorTask;
-import com.qualcomm.qti.snpe.imageclassifiers.tasks.ClassifyImageWithUserBufferTf8Task;
-import com.qualcomm.qti.snpe.imageclassifiers.tasks.AbstractSuperResolutionTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.DSPSuperResolutionService;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.GPUSuperResolutionService;
-import com.qualcomm.qti.snpe.imageclassifiers.tasks.SuperResolutionWithFloatTensorTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.LoadImageTask;
 import com.qualcomm.qti.snpe.imageclassifiers.tasks.LoadNetworkTask;
-import com.qualcomm.qti.snpe.imageclassifiers.tasks.SuperResolutionWithUserBufferTf8Task;
-import com.qualcomm.qti.snpe.NeuralNetwork;
 
 import java.io.File;
 import java.lang.ref.SoftReference;
@@ -227,38 +220,7 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
         //}
     }
 
-    public void classify(final Bitmap bitmap) {
-        if (mNeuralNetwork != null) {
-            AbstractClassifyImageTask task;
-            switch (mNetworkTensorFormat) {
-                case FLOAT:
-                default:
-                    task = new ClassifyImageWithFloatTensorTask(this, mNeuralNetwork, bitmap, mModel);
-                    break;
-            }
-            task.executeOnExecutor(AsyncTask.SERIAL_EXECUTOR);
 
-        } else {
-            getView().displayModelNotLoaded();
-        }
-    }
-
-    public void onClassificationResult(String[] labels, long javaExecuteTime) {
-        if (isAttached()) {
-            ModelOverviewFragment view = getView();
-            view.setClassificationResult(labels);
-            view.setJavaExecuteStatistics(javaExecuteTime);
-        }
-    }
-
-
-
-    public void onClassificationFailed() {
-        if (isAttached()) {
-            getView().displayClassificationFailed();
-            getView().setJavaExecuteStatistics(-1);
-        }
-    }
 
     public void setTargetRuntime(NeuralNetwork.Runtime runtime) {
         mRuntime = runtime;

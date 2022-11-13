@@ -110,7 +110,7 @@ public class ModelExtractionService extends IntentService {
                 zipInputStream.closeEntry();
             }
             getContentResolver().notifyChange(
-                Uri.withAppendedPath(Model.MODELS_URI, modelName), null);
+                Uri.withAppendedPath(Model.MODELS_URI, modelName), null); // 用来通知mModelExtractionObserver
             //Copy UDO configs to context directory.
             extractUdoConfig(modelRoot.getAbsolutePath(), "/udo/arm64-v8a/");
             extractUdoConfig(modelRoot.getAbsolutePath(), "/udo/dsp/");
@@ -121,7 +121,7 @@ public class ModelExtractionService extends IntentService {
                     zipInputStream.close();
                 }
             } catch (IOException ignored) {}
-            getContentResolver().notifyChange(Model.MODELS_URI, null);
+            getContentResolver().notifyChange(Model.MODELS_URI, null); // 用来通知mModelExtractionFailedObserver
         }
 
     }
@@ -165,13 +165,14 @@ public class ModelExtractionService extends IntentService {
             throw new IOException("Unable to create model root directory: " +
                 modelRoot.getAbsolutePath());
         }
+        /*
         final File imagesRoot = new File(modelRoot, "images");
         if (!imagesRoot.isDirectory()) {
             if( !imagesRoot.mkdir()) {
                 throw new IOException("Unable to create image root directory: " +
                         imagesRoot.getAbsolutePath());
             }
-        }
+        }*/
         return modelRoot;
     }
 
