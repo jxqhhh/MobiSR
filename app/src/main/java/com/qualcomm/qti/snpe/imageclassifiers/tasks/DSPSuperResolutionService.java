@@ -10,11 +10,13 @@ import android.content.Intent;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.os.SystemClock;
 
 import com.qualcomm.qti.snpe.FloatTensor;
 import com.qualcomm.qti.snpe.NeuralNetwork;
 import com.qualcomm.qti.snpe.Tensor;
+import com.qualcomm.qti.snpe.imageclassifiers.ModelOverviewFragmentController;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -128,7 +130,7 @@ public class DSPSuperResolutionService extends IntentService {
 
     public static NeuralNetwork mNeuralNetwork;
 
-    public void processBitmap(final Bitmap bitmap) {
+    public void processBitmap(final Bitmap bitmap, ResultReceiver resultReceiver) {
 
         System.out.println("jxq 1");
         Bitmap result = null;
@@ -159,7 +161,7 @@ public class DSPSuperResolutionService extends IntentService {
         System.out.println("jxq 5");
         final long javaExecuteEnd = SystemClock.elapsedRealtime();
         mJavaExecuteTime = javaExecuteEnd - javaExecuteStart;
-        /*
+
         for (Map.Entry<String, FloatTensor> output : outputs.entrySet()) {
             if (output.getKey().equals(mOutputLayer)) {
                 FloatTensor outputTensor = output.getValue();
@@ -167,13 +169,13 @@ public class DSPSuperResolutionService extends IntentService {
                 final float[] array = new float[outputTensor.getSize()];
                 outputTensor.read(array, 0, array.length);
 
-                final int[] pixels = new int[mImage.getWidth() * mImage.getHeight() * 4];
+                final int[] pixels = new int[ModelOverviewFragmentController.patch_height * ModelOverviewFragmentController.patch_width * 4];
                 int pixels_idx = 0;
-                for (int i = 0; i < mImage.getHeight()*2; i ++) {
-                    for (int j = 0; j < mImage.getWidth() * 2; j ++) {
+                for (int i = 0; i < ModelOverviewFragmentController.patch_height * 2; i ++) {
+                    for (int j = 0; j < ModelOverviewFragmentController.patch_width * 2; j ++) {
                         int pixel = 0xf0 << 24;
                         for (int c = 0; c < 3; c ++){
-                            int idx = 3 * (i * mImage.getWidth() * 2 + j) + c;
+                            int idx = 3 * (i * ModelOverviewFragmentController.patch_width * 2 + j) + c;
                             int offset = 8 * c;
                             pixel += (((int)array[idx]) & 0xff) << offset;
                         }
@@ -182,10 +184,11 @@ public class DSPSuperResolutionService extends IntentService {
                     }
                 }
                 // ARGB_8888: (A & 0xff) << 24 | (B & 0xff) << 16 | (G & 0xff) << 8 | (R & 0xff)
-                result = Bitmap.createBitmap(pixels, mImage.getWidth()*2, mImage.getHeight()*2, Bitmap.Config.ARGB_8888);
+                result = Bitmap.createBitmap(pixels, ModelOverviewFragmentController.patch_width * 2,
+                        ModelOverviewFragmentController.patch_height * 2, Bitmap.Config.ARGB_8888);
             }
         }
-        */
+
 
         releaseTensors(inputs, outputs);
 
@@ -193,6 +196,10 @@ public class DSPSuperResolutionService extends IntentService {
 
         final long end = SystemClock.elapsedRealtime();
         System.out.println("End patch super-resolution at "+end);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ModelOverviewFragmentController.SuperResolutionServiceResultKey, result);
+        resultReceiver.send(ModelOverviewFragmentController.SuperResolutionServiceResultCode, bundle); // TODO: update the code here
     }
 
 
@@ -205,12 +212,13 @@ public class DSPSuperResolutionService extends IntentService {
         }
     }
 
-    public static void processPatch(Context context, Bitmap bitmap) {
+    public static void processPatch(Context context, Bitmap bitmap, ResultReceiver resultReceiver) {
         System.out.println("Process patch started");
         Intent intent = new Intent(context, DSPSuperResolutionService.class);
         intent.setAction(ACTION_DSP);
         Bundle bundle = new Bundle();
         bundle.putParcelable("patch", bitmap);// 序列化
+        bundle.putParcelable("receiver", resultReceiver);
         intent.putExtras(bundle);// 发送数据
         context.startService(intent);
 
@@ -225,11 +233,11 @@ public class DSPSuperResolutionService extends IntentService {
             final String action = intent.getAction();
             if (ACTION_DSP.equals(action)) {
                 final Bitmap bitmap = intent.getParcelableExtra("patch");
+                final ResultReceiver resultReceiver = intent.getParcelableExtra("receiver");
                 System.out.println("Process bitmap started");
-                processBitmap(bitmap);
+                processBitmap(bitmap, resultReceiver);
             }
         }
     }
-
 
 }

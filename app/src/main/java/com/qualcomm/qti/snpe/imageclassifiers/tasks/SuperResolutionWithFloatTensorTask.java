@@ -65,9 +65,16 @@ public class SuperResolutionWithFloatTensorTask extends AbstractSuperResolutionT
                     for (int j = 0; j < mImage.getWidth() * 2; j ++) {
                         int pixel = 0xf0 << 24;
                         for (int c = 0; c < 3; c ++){
-                            int idx = 3 * (i * mImage.getWidth() * 2 + j) + c;
+                            int idx = 3 * (i * mImage.getWidth() * 2 + j) + (2-c);
                             int offset = 8 * c;
-                            pixel += (((int)array[idx]) & 0xff) << offset;
+                            float item = array[idx];
+                            if (item < 0){
+                                item = 0;
+                            }
+                            if (item>255){
+                                item=255;
+                            }
+                            pixel += (((int)item) & 0xff) << offset;
                         }
                         pixels[pixels_idx] = pixel;
                         pixels_idx ++;

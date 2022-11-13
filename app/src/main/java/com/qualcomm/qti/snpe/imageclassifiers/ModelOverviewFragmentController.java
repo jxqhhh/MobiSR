@@ -43,8 +43,8 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
     final float GPUDelay = 35;
     final float DSPDelay = 15;
 
-    final public static int patch_width = 90;
-    final public static int patch_height = 160;
+    final public static int patch_width = 160;
+    final public static int patch_height = 90;
     final public static int overlapping_size = 10;
     final float TV_threshold = 12;
 
@@ -167,8 +167,8 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
         final int[] pixels = new int[patch.getWidth() * patch.getHeight()];
         patch.getPixels(pixels, 0, patch.getWidth(), 0, 0,
                 patch.getWidth(), patch.getHeight());
-        for (int y = 0; y < patch.getHeight(); y++) {
-            for (int x = 0; x < patch.getWidth(); x++) {
+        for (int y = 0; y < patch.getHeight()-1; y++) {
+            for (int x = 0; x < patch.getWidth()-1; x++) {
                 final int idx = y * patch.getWidth() + x;
                 final float b = pixels[idx] & 0xFF;
                 float g = ((pixels[idx] >>  8) & 0xFF);
@@ -192,8 +192,6 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
     public void superResolution(final Bitmap bitmap) {
         //if (mNeuralNetwork != null) { // TODO: judge if all the network models are loaded
             // TODO: 在这记录开始时间
-            // TODO: divide into patches
-            // TODO: call AsyncTask。每个AsyncTask是一个线程顺序执行，多个AysncTask类对应多个线程。
         Handler handler = new Handler();
         ResultReceiver resultReceiver = new ResultReceiver(handler){
             @Override
@@ -211,24 +209,23 @@ public class ModelOverviewFragmentController extends AbstractViewController<Mode
         float timeGPU = 0;
         for (int i = 0; i < (int)(Math.floor((bitmap.getHeight()-overlapping_size)/(patch_height-overlapping_size))); i ++){
             for (int j = 0; j < (int)(Math.floor((bitmap.getWidth()-overlapping_size)/(patch_width-overlapping_size))); j ++){
-                Bitmap patch = Bitmap.createBitmap(bitmap, j*(patch_width-overlapping_size), patch_width, i*(patch_height-overlapping_size), patch_height);
+                Bitmap patch = Bitmap.createBitmap(bitmap, j*(patch_width-overlapping_size), i*(patch_height-overlapping_size), patch_width, patch_height);
                 float TV = getTV(patch);
                 if (TV<TV_threshold){
                     if(timeCPU+CPUDelay<timeGPU+GPUDelay){
-                        CPUSuperResolutionService.processPatch(mContext, bitmap, resultReceiver);
+                        CPUSuperResolutionService.processPatch(mContext, patch, resultReceiver);
                         timeCPU += CPUDelay;
                     }else{
-                        GPUSuperResolutionService.processPatch(mContext, bitmap);
+                        GPUSuperResolutionService.processPatch(mContext, patch, resultReceiver);
                         timeGPU += GPUDelay;
                     }
                 }else {
-                    DSPSuperResolutionService.processPatch(mContext, bitmap);
+                    DSPSuperResolutionService.processPatch(mContext, patch, resultReceiver);
                 }
             }
         }
-            // TODO: 利用ResultReceiver获得数据
 
-            // TODO： 在callback里记录完成时间（每次callback给n+1，当n等于numberPatches说明搞定了）
+        // TODO： 在callback里记录完成时间（每次callback给n+1，当n等于numberPatches说明搞定了）
 
         //} else {
         //    getView().displayModelNotLoaded();

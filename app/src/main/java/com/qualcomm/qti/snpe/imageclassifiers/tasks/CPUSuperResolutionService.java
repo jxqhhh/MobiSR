@@ -240,5 +240,4 @@ public class CPUSuperResolutionService extends IntentService {
         }
     }
 
-
 }
